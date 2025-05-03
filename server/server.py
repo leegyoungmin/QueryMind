@@ -153,4 +153,4 @@ def close_connection(connection_id: str) -> Dict[str, Any]:
         }
 
 if __name__ == "__main__":
-    mcp.run(transport = 'stdio')
+    mcp.run(transport='sse')

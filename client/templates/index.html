@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QueryMind</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f5f5f5;
+        }
+        
+        body {
+            background-color: var(--secondary-color);
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+        }
+        
+        .tool-card {
+            margin-bottom: 1.5rem;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .card-title {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .parameter-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .parameter-item {
+            background-color: #f8f9fa;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .required-badge {
+            background-color: #dc3545;
+        }
+        
+        .tool-description {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        
+        .search-box {
+            margin-bottom: 2rem;
+        }
+        
+        .search-input {
+            border-radius: 20px;
+            padding-left: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-robot"></i> QueryMind
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="search-box">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0 search-input" 
+                               placeholder="도구 검색..." id="searchInput">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" id="toolsContainer">
+            {% for tool in tools %}
+            <div class="col-md-6 tool-item">
+                <div class="card tool-card">
+                    <div class="card-header">
+                        <h5 class="card-title">
+                            <i class="bi bi-tools"></i> {{ tool.name }}
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="tool-description">{{ tool.description }}</p>
+                        <h6 class="mb-3">
+                            <i class="bi bi-gear"></i> 파라미터
+                        </h6>
+                        <ul class="parameter-list">
+                            {% for param in tool.parameters %}
+                            <li class="parameter-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong>{{ param.name }}</strong>
+                                    <span class="badge bg-secondary">{{ param.parameter_type }}</span>
+                                </div>
+                                {% if param.required %}
+                                <span class="badge required-badge">필수</span>
+                                {% endif %}
+                                <p class="mb-0 mt-1">{{ param.description }}</p>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        <a href="/tools/{{ tool.name }}" class="btn btn-primary">실행</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchText = e.target.value.toLowerCase();
+            const tools = document.querySelectorAll('.tool-item');
+            
+            tools.forEach(tool => {
+                const toolName = tool.querySelector('.card-title').textContent.toLowerCase();
+                const toolDescription = tool.querySelector('.tool-description').textContent.toLowerCase();
+                
+                if (toolName.includes(searchText) || toolDescription.includes(searchText)) {
+                    tool.style.display = '';
+                } else {
+                    tool.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

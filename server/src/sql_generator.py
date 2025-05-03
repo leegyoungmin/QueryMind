@@ -2,6 +2,7 @@ import os
 import anthropic
 
 from typing import Dict, Any, Optional
+from openai import OpenAI
 
 class SQLGenerator:
     def __init__(self, api_key: Optional[str] = None):
@@ -30,7 +31,11 @@ class SQLGenerator:
             model = "claude-3-5-sonnet-20241022",
             max_tokens = 1000,
             temperature = 0,
-            system = "데이터베이스 전문가로서 자연어를 SQL로 변환합니다. SQL 쿼리만 반환하고 다른 설명은 하지 마세요.",
+            system = """
+            데이터베이스 전문가로서 자연어를 SQL로 변환합니다. SQL 쿼리만 반환하고 다른 설명은 하지 마세요.
+            또한 쿼리 실행 결과를 반환하지 말고, 텍스트로 반환해주세요.
+            그 어떤 결과도 반환하지 말고, 오직 쿼리만 반환해주세요.
+            """,
             messages = [
                 {"role": "user", "content": prompt}
             ]
