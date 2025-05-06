@@ -211,3 +211,4 @@ pyrightconfig.json
 uv.lock
 .python-version
 pyproject.toml
+.idea
