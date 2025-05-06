@@ -1,20 +1,30 @@
 from typing import Dict, Optional, Any
 
-from src.db_manager import DBManager
-from src.sql_generator import SQLGenerator
-from src.security import SecurityValidator
+from src.services.db_manager import DBManager
+from src.services.sql_generator import SQLGenerator
+from src.services.security import SecurityValidator
 
 from mcp.server import FastMCP
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
 mcp = FastMCP("query-mind-mcp")
-
+    
 db_manager = DBManager()
-sql_generator = SQLGenerator()
+sql_generator = SQLGenerator(mcp = mcp)
 security_validator = SecurityValidator()
+
+@mcp.prompt()
+def sql_generation_prompt(schema: str, query: str, db_type: str) -> str:
+    return f"""
+    다음 데이터베이스 스키마를 기반으로 자연어 질의를 SQL 쿼리로 변환해주세요:
+
+    {schema}
+
+    자연어 질의: {query}
+
+    데이터베이스 유형: {db_type}
+
+    SQL 쿼리:
+    """
 
 @mcp.tool()
 def connect_database(db_type: str, connection_string: str) -> Dict[str, Any]:
@@ -153,4 +163,14 @@ def close_connection(connection_id: str) -> Dict[str, Any]:
         }
 
 if __name__ == "__main__":
-    mcp.run(transport='sse')
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--transport", type = str, default = "stdio")
+
+    args = parser.parse_args()
+
+    if args.transport not in ['sse', 'stdio']:
+        raise ValueError("지원되지 않는 전송 프로토콜입니다. 사용 가능한 프로토콜: sse, stdio")
+
+    mcp.run(transport = args.transport)
